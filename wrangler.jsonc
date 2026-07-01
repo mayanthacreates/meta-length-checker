@@ -1,0 +1,9 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "tool-meta-length-checker",
+  "compatibility_date": "2026-06-01",
+  "assets": { "directory": "./public", "html_handling": "auto-trailing-slash" },
+  "routes": [
+    { "pattern": "mayantha.ae/meta-length-checker*", "zone_name": "mayantha.ae" }
+  ]
+}

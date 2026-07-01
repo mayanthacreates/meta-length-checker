@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meta Title &amp; Description Length Checker - SERP Preview</title>
+<meta name="description" content="Free meta title and description length checker with a pixel-accurate Google SERP preview. Test desktop and mobile truncation limits before you publish.">
+<link rel="canonical" href="https://mayantha.ae/meta-length-checker">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mayantha.ae/meta-length-checker">
+<meta property="og:title" content="Meta Title &amp; Description Length Checker - SERP Preview">
+<meta property="og:description" content="Free meta title and description length checker with a pixel-accurate Google SERP preview. Test desktop and mobile truncation limits before you publish.">
+<meta property="og:site_name" content="Mayantha">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============ tokens (mayantha.ae brand system - do not edit) ============ */
+:root{
+  --paper:#ffffff;
+  --ink:#161C2D;
+  --ink-2:#565b66;
+  --ink-3:#757A85;
+  --wash:#F4F7FA;
+  --wash-2:#e9eef4;
+  --line:#E7E9ED;
+  --line-2:#d4d8df;
+  --brand:#0263FA;
+  --brand-ink:#ffffff;
+  --green-strong:#15A34A;
+  --red:#fa403b;
+  --amber:#d97706; /* near-limit meter state (AA on white) */
+  --paper-2:rgba(255,255,255,.62);
+  --line-dark:rgba(255,255,255,.14);
+
+  --font-body:'Poppins',Arial,sans-serif;
+  --text-xs:12px; --text-sm:14px; --text-base:16px;
+  --text-lg:clamp(16px,1.4vw,20px);
+  --text-xl:clamp(18px,1.9vw,24px);
+  --text-2xl:clamp(22px,2.6vw,34px);
+  --text-hero:clamp(28px,4.6vw,54px);
+  --leading-display:0.98; --leading-body:1.55;
+  --tracking-display:-0.045em; --tracking-label:0.14em;
+
+  --space-3xs:4px; --space-2xs:8px; --space-xs:12px; --space-sm:16px;
+  --space-md:24px; --space-lg:32px; --space-xl:48px; --space-2xl:64px;
+  --space-3xl:96px;
+  --gutter:clamp(24px,6vw,96px);
+  --maxw:1320px;
+
+  --radius:3px;
+
+  /* Google SERP specimen colors - deliberately mimic Google, non-token exception */
+  --serp-link:#1a0dab;
+  --serp-url:#4d5156;
+  --serp-snippet:#4d5156;
+  --serp-site:#202124;
+
+  --ease-reveal:cubic-bezier(0.22,0.8,0.18,1);
+  --dur-micro:200ms;
+}
+
+/* ============ base ============ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  font-size:var(--text-base);
+  line-height:var(--leading-body);
+  color:var(--ink);
+  background:var(--paper);
+  -webkit-font-smoothing:antialiased;
+}
+.container{max-width:var(--maxw);margin-inline:auto;padding-inline:var(--gutter)}
+a{color:inherit;text-decoration:none}
+a:hover{color:var(--brand)}
+a,button,input,textarea,summary{transition:color var(--dur-micro) ease,background-color var(--dur-micro) ease,border-color var(--dur-micro) ease,transform var(--dur-micro) ease}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:var(--radius)}
+
+.label{
+  font-size:var(--text-xs);
+  font-weight:500;
+  letter-spacing:var(--tracking-label);
+  text-transform:uppercase;
+  color:var(--ink-3);
+}
+
+/* ============ entry reveal ============ */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .6s var(--ease-reveal),transform .6s var(--ease-reveal)}
+.reveal.is-in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none}
+  *{transition-duration:1ms!important;animation-duration:1ms!important}
+  html{scroll-behavior:auto}
+}
+
+/* ============ header ============ */
+.site-header{border-bottom:1px solid var(--line)}
+.site-header .container{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-block:var(--space-sm);
+}
+.wordmark{font-weight:600;font-size:var(--text-base);color:var(--ink)}
+.header-nav{display:flex;align-items:center;gap:var(--space-md);font-size:var(--text-sm)}
+.header-nav .nav-muted{color:var(--ink-2)}
+.header-nav .nav-cta{color:var(--brand);font-weight:500}
+.header-nav .nav-cta:hover{color:var(--ink)}
+
+/* ============ hero ============ */
+.hero{padding-block:var(--space-2xl) var(--space-xl)}
+.hero h1{
+  font-size:var(--text-hero);
+  line-height:var(--leading-display);
+  letter-spacing:var(--tracking-display);
+  font-weight:600;
+  max-width:16ch;
+}
+.hero p{margin-top:var(--space-sm);color:var(--ink-2);font-size:var(--text-lg);max-width:52ch}
+
+/* ============ tool workspace ============ */
+.tool{padding-bottom:var(--space-3xl)}
+.workspace{
+  display:grid;
+  grid-template-columns:minmax(0,5fr) minmax(0,7fr);
+  gap:var(--space-xl);
+  align-items:start;
+}
+@media (max-width:960px){
+  .workspace{grid-template-columns:1fr;gap:var(--space-lg)}
+}
+
+/* --- inputs --- */
+.panel{display:flex;flex-direction:column;gap:var(--space-lg)}
+.field{display:flex;flex-direction:column;gap:var(--space-2xs)}
+.field-head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-sm)}
+.char-count{font-size:var(--text-xs);color:var(--ink-3);font-variant-numeric:tabular-nums}
+.field input[type="text"],
+.field input[type="url"],
+.field textarea{
+  font-family:var(--font-body);
+  font-size:var(--text-base);
+  color:var(--ink);
+  background:var(--paper);
+  border:1px solid var(--line-2);
+  border-radius:var(--radius);
+  padding:var(--space-xs) var(--space-sm);
+  width:100%;
+}
+.field textarea{resize:vertical;min-height:96px}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--brand)}
+.field input::placeholder,.field textarea::placeholder{color:var(--ink-3)}
+
+/* --- meter --- */
+.meter{display:flex;flex-direction:column;gap:var(--space-3xs)}
+.meter-track{
+  position:relative;height:var(--space-3xs);
+  background:var(--wash-2);border-radius:var(--radius);overflow:hidden;
+}
+.meter-fill{
+  position:absolute;inset:0 auto 0 0;width:0%;
+  background:var(--green-strong);
+  transition:width 150ms var(--ease-reveal),background-color var(--dur-micro) ease;
+}
+.meter.is-warn .meter-fill{background:var(--amber)}
+.meter.is-over .meter-fill{background:var(--red)}
+.meter-cut{
+  position:absolute;top:0;bottom:0;width:2px;background:var(--ink);
+  opacity:0;transition:opacity var(--dur-micro) ease,left 150ms var(--ease-reveal);
+}
+.meter.is-over .meter-cut{opacity:1}
+.meter-read{
+  display:flex;justify-content:space-between;gap:var(--space-sm);
+  font-size:var(--text-xs);color:var(--ink-3);font-variant-numeric:tabular-nums;
+}
+.meter-px{color:var(--ink-2);font-weight:500}
+.meter.is-warn .meter-px{color:var(--amber)}
+.meter.is-over .meter-px{color:var(--red)}
+.meter-note{font-size:var(--text-xs);color:var(--red);min-height:calc(var(--text-xs) * var(--leading-body))}
+
+/* --- preview side --- */
+.preview-head{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:var(--space-sm);margin-bottom:var(--space-sm);
+}
+.toggle{
+  display:inline-flex;border:1px solid var(--line-2);
+  border-radius:999px;padding:var(--space-3xs);background:var(--paper);
+}
+.toggle button{
+  font-family:var(--font-body);font-size:var(--text-xs);font-weight:500;
+  letter-spacing:var(--tracking-label);text-transform:uppercase;
+  border:0;background:transparent;color:var(--ink-3);
+  padding:var(--space-3xs) var(--space-sm);border-radius:999px;cursor:pointer;
+}
+.toggle button[aria-pressed="true"]{background:var(--ink);color:var(--brand-ink)}
+.toggle button:not([aria-pressed="true"]):hover{color:var(--ink)}
+
+.serp-stage{
+  border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--wash);
+  padding:var(--space-xl) var(--space-lg);
+  display:flex;justify-content:center;
+  overflow-x:auto;
+}
+.serp-card{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:var(--space-md);
+  width:648px;            /* 600px content + padding, Google desktop result width */
+  max-width:100%;
+  transition:width .35s var(--ease-reveal);
+}
+.serp-card.is-mobile{width:448px} /* ~400px content column */
+
+/* Google SERP specimen - Arial on purpose, mimics live SERP */
+.serp{font-family:Arial,Helvetica,sans-serif}
+.serp-top{display:flex;align-items:center;gap:var(--space-xs)}
+.serp-favicon{
+  width:26px;height:26px;border-radius:50%;flex:none;
+  background:var(--wash-2);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  font-size:var(--text-xs);font-weight:600;color:var(--ink-2);
+  font-family:var(--font-body);
+}
+.serp-source{min-width:0;line-height:1.3}
+.serp-site{font-size:14px;color:var(--serp-site);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.serp-url{font-size:12px;color:var(--serp-url);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.serp-title{
+  display:block;margin-top:var(--space-xs);
+  color:var(--serp-link);          /* non-token exception: Google link blue */
+  font-size:20px;line-height:1.3;font-weight:400;
+  white-space:nowrap;overflow:hidden;
+  cursor:pointer;
+}
+.serp-title:hover{text-decoration:underline;color:var(--serp-link)}
+.serp-card.is-mobile .serp-title{font-size:16px;white-space:normal}
+.serp-snippet{margin-top:var(--space-3xs);font-size:14px;line-height:1.58;color:var(--serp-snippet)}
+.serp-snippet .snippet-date{color:var(--ink-3)}
+.serp-empty{color:var(--ink-3);font-style:normal}
+.preview-caption{margin-top:var(--space-xs);font-size:var(--text-xs);color:var(--ink-3)}
+
+/* ============ how it works ============ */
+.how{border-top:1px solid var(--line);padding-block:var(--space-3xl)}
+.how h2,.faq h2{
+  font-size:var(--text-2xl);letter-spacing:var(--tracking-display);
+  line-height:var(--leading-display);font-weight:600;
+  margin-bottom:var(--space-xl);
+}
+.steps{list-style:none;counter-reset:step}
+.steps li{
+  counter-increment:step;
+  display:grid;grid-template-columns:var(--space-2xl) 1fr;
+  gap:var(--space-md);
+  padding-block:var(--space-md);
+  border-top:1px solid var(--line);
+}
+.steps li:last-child{border-bottom:1px solid var(--line)}
+.steps li::before{
+  content:counter(step,decimal-leading-zero);
+  font-size:var(--text-sm);color:var(--ink-3);font-variant-numeric:tabular-nums;
+  padding-top:var(--space-3xs);
+}
+.steps h3{font-size:var(--text-lg);font-weight:600}
+.steps p{margin-top:var(--space-3xs);color:var(--ink-2);font-size:var(--text-sm);max-width:60ch}
+
+/* ============ faq ============ */
+.faq{border-top:1px solid var(--line);padding-block:var(--space-3xl)}
+.faq details{border-top:1px solid var(--line)}
+.faq details:last-of-type{border-bottom:1px solid var(--line)}
+.faq summary{
+  list-style:none;cursor:pointer;
+  display:flex;justify-content:space-between;align-items:center;gap:var(--space-md);
+  padding-block:var(--space-md);
+  font-weight:500;font-size:var(--text-base);
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{
+  content:"+";font-weight:400;color:var(--ink-3);
+  font-size:var(--text-lg);line-height:1;
+  transition:transform var(--dur-micro) ease;
+}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq summary:hover{color:var(--brand)}
+.faq .faq-body{padding-bottom:var(--space-md);color:var(--ink-2);font-size:var(--text-sm);max-width:64ch}
+
+/* ============ footer band ============ */
+.footer-band{background:var(--ink);color:var(--brand-ink);padding-block:var(--space-3xl)}
+.footer-band .band-grid{
+  display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);
+  gap:var(--space-2xl);align-items:start;
+}
+@media (max-width:820px){.footer-band .band-grid{grid-template-columns:1fr;gap:var(--space-xl)}}
+.footer-band h2{
+  font-size:var(--text-2xl);letter-spacing:var(--tracking-display);
+  line-height:var(--leading-display);font-weight:600;max-width:20ch;
+}
+.footer-band .band-sub{margin-top:var(--space-sm);color:var(--paper-2);font-size:var(--text-base);max-width:44ch}
+.btn-invert{
+  display:inline-block;margin-top:var(--space-lg);
+  background:var(--paper);color:var(--ink);
+  font-weight:500;font-size:var(--text-sm);
+  padding:var(--space-xs) var(--space-md);
+  border-radius:var(--radius);
+}
+.btn-invert:hover{background:var(--wash-2);color:var(--ink);transform:translateY(-2px)}
+.tool-links{margin-top:var(--space-sm)}
+.tool-links .label{color:var(--paper-2)}
+.tool-links ul{list-style:none;margin-top:var(--space-sm)}
+.tool-links li{border-top:1px solid var(--line-dark)}
+.tool-links li:last-child{border-bottom:1px solid var(--line-dark)}
+.tool-links a{display:block;padding-block:var(--space-xs);font-size:var(--text-sm);color:var(--paper-2)}
+.tool-links a:hover{color:var(--brand-ink)}
+.footer-meta{
+  margin-top:var(--space-2xl);padding-top:var(--space-md);
+  border-top:1px solid var(--line-dark);
+  display:flex;justify-content:space-between;gap:var(--space-sm);
+  font-size:var(--text-xs);color:var(--paper-2);flex-wrap:wrap;
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a class="wordmark" href="https://mayantha.ae">Mayantha</a>
+    <nav class="header-nav" aria-label="Site">
+      <a class="nav-muted" href="https://mayantha.ae/tools">All tools</a>
+      <a class="nav-cta" href="https://mayantha.ae/contact">Start a project</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero container">
+    <h1 class="reveal">Meta title &amp; description checker.</h1>
+    <p class="reveal" style="transition-delay:80ms">See exactly how your page renders on Google - pixel-accurate truncation, desktop and mobile.</p>
+  </section>
+
+  <section class="tool container" aria-label="Meta length checker tool">
+    <div class="workspace">
+
+      <!-- inputs -->
+      <div class="panel reveal" style="transition-delay:140ms">
+        <div class="field">
+          <div class="field-head">
+            <label class="label" for="in-title">Meta title</label>
+            <span class="char-count" id="title-chars">0 chars</span>
+          </div>
+          <input type="text" id="in-title" autocomplete="off" spellcheck="false"
+            placeholder="Automotive Photography in Dubai | Mayantha"
+            value="Automotive Photography in Dubai - Cinematic Car Shoots | Mayantha">
+          <div class="meter" id="meter-title">
+            <div class="meter-track"><div class="meter-fill"></div><div class="meter-cut"></div></div>
+            <div class="meter-read">
+              <span class="meter-px" id="title-px">0px / 580px</span>
+              <span id="title-state">within range</span>
+            </div>
+            <p class="meter-note" id="title-note" aria-live="polite"></p>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-head">
+            <label class="label" for="in-desc">Meta description</label>
+            <span class="char-count" id="desc-chars">0 chars</span>
+          </div>
+          <textarea id="in-desc" rows="4" spellcheck="false"
+            placeholder="Describe the page in one or two sentences...">Cinematic automotive photography and social-first content for dealerships and car brands in Dubai. Rollers, statics, and full campaign shoots - booked around your inventory, delivered in days.</textarea>
+          <div class="meter" id="meter-desc">
+            <div class="meter-track"><div class="meter-fill"></div><div class="meter-cut"></div></div>
+            <div class="meter-read">
+              <span class="meter-px" id="desc-px">0px / 920px</span>
+              <span id="desc-state">within range</span>
+            </div>
+            <p class="meter-note" id="desc-note" aria-live="polite"></p>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-head">
+            <label class="label" for="in-url">Page URL <span style="text-transform:none;letter-spacing:0">(optional)</span></label>
+          </div>
+          <input type="url" id="in-url" autocomplete="off" spellcheck="false"
+            placeholder="https://mayantha.ae/automotive-photography"
+            value="https://mayantha.ae/automotive-photography">
+        </div>
+      </div>
+
+      <!-- preview -->
+      <div class="reveal" style="transition-delay:220ms">
+        <div class="preview-head">
+          <span class="label">Google preview</span>
+          <div class="toggle" role="group" aria-label="Preview device">
+            <button type="button" id="tg-desktop" aria-pressed="true">Desktop</button>
+            <button type="button" id="tg-mobile" aria-pressed="false">Mobile</button>
+          </div>
+        </div>
+        <div class="serp-stage">
+          <div class="serp-card serp" id="serp-card">
+            <div class="serp-top">
+              <div class="serp-favicon" id="serp-favicon" aria-hidden="true">M</div>
+              <div class="serp-source">
+                <div class="serp-site" id="serp-site">mayantha.ae</div>
+                <div class="serp-url" id="serp-url">https://mayantha.ae</div>
+              </div>
+            </div>
+            <a class="serp-title" id="serp-title" tabindex="0"></a>
+            <p class="serp-snippet" id="serp-snippet"></p>
+          </div>
+        </div>
+        <p class="preview-caption" id="preview-caption">Rendered at Google&rsquo;s desktop metrics - Arial 20px title, 580px limit; Arial 14px description, 920px limit.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="how container">
+    <h2 class="reveal">How it works</h2>
+    <ol class="steps">
+      <li class="reveal">
+        <div>
+          <h3>Paste your title and description</h3>
+          <p>Drop in the meta title and description from your page - or draft new ones right here. The preview updates on every keystroke.</p>
+        </div>
+      </li>
+      <li class="reveal" style="transition-delay:80ms">
+        <div>
+          <h3>Watch the real pixel width</h3>
+          <p>Google truncates by pixels, not characters. We measure your text with the same font metrics Google uses on the results page, so the meter shows the true rendered width.</p>
+        </div>
+      </li>
+      <li class="reveal" style="transition-delay:160ms">
+        <div>
+          <h3>Check desktop and mobile</h3>
+          <p>Flip the preview between devices. Each mode swaps in that device&rsquo;s fonts and cut-off limits, and marks exactly where your snippet gets clipped.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section class="faq container">
+    <h2 class="reveal">Frequently asked questions</h2>
+    <div class="reveal" style="transition-delay:80ms">
+      <details>
+        <summary>How long should a meta title be?</summary>
+        <p class="faq-body">Keep the title under roughly 580 pixels on desktop - usually 50 to 60 characters. Wider than that and Google cuts it mid-thought with an ellipsis, which costs clicks. Pixel width is what matters: wide letters like W and M use up the budget faster than narrow ones.</p>
+      </details>
+      <details>
+        <summary>How long should a meta description be?</summary>
+        <p class="faq-body">Aim for about 920 pixels on desktop - typically 150 to 160 characters. Mobile allows a little more. Google rewrites descriptions it doesn&rsquo;t like, but a tight, relevant description within the limit is far more likely to be shown as written.</p>
+      </details>
+      <details>
+        <summary>Why measure pixels instead of counting characters?</summary>
+        <p class="faq-body">Google truncates snippets at a fixed pixel width, not a character count. &ldquo;Illinois&rdquo; and &ldquo;WWDC 2026&rdquo; are both 8-9 characters but render at very different widths. Character counters are a rough proxy; this tool measures the actual rendered width using Google&rsquo;s SERP font metrics.</p>
+      </details>
+      <details>
+        <summary>Do desktop and mobile have different limits?</summary>
+        <p class="faq-body">Yes. Desktop titles render at Arial 20px with roughly a 580px limit; mobile titles are smaller but wrap across a wider block, so about 920px fits. Descriptions get around 920px on desktop and 1300px on mobile. The device toggle applies the right metrics for each.</p>
+      </details>
+      <details>
+        <summary>Will Google always show my meta description?</summary>
+        <p class="faq-body">Not always - Google generates its own snippet for around a third of results when it thinks page content answers the query better. You still control the default, and a well-written description within the pixel limit is used most of the time.</p>
+      </details>
+    </div>
+  </section>
+</main>
+
+<footer class="footer-band" id="tools">
+  <div class="container">
+    <div class="band-grid">
+      <div class="reveal">
+        <h2>Need this done for your business?</h2>
+        <p class="band-sub">I build fast, search-ready websites and content for brands in Dubai. If your meta tags need more than a checker, let&rsquo;s talk.</p>
+        <a class="btn-invert" href="https://mayantha.ae/contact">Start a project</a>
+      </div>
+      <nav class="tool-links reveal" style="transition-delay:100ms" aria-label="Other free tools">
+        <span class="label">More free tools</span>
+        <ul><li><a href="/whatsapp-link-generator">WhatsApp link generator</a></li><li><a href="/uae-invoice-generator">UAE invoice generator</a></li><li><a href="/webp-converter">WebP converter</a></li></ul>
+      </nav>
+    </div>
+    <div class="footer-meta">
+      <span>&copy; 2026 Mayantha - mayantha.ae</span>
+      <span>Free tool. No signup, nothing stored.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- pixel measurement (hidden canvas, Google SERP font metrics) ---------- */
+  var canvas=document.createElement("canvas");
+  var ctx=canvas.getContext("2d");
+  function widthOf(text,font){ctx.font=font;return ctx.measureText(text).width;}
+
+  /* Google SERP metrics per device */
+  var METRICS={
+    desktop:{
+      title:{font:"400 20px Arial",limit:580},
+      desc:{font:"400 14px Arial",limit:920},
+      caption:"Rendered at Google’s desktop metrics - Arial 20px title, 580px limit; Arial 14px description, 920px limit."
+    },
+    mobile:{
+      title:{font:"400 16px Arial",limit:920},
+      desc:{font:"400 14px Arial",limit:1300},
+      caption:"Rendered at Google’s mobile metrics - Arial 16px title, 920px limit; Arial 14px description, 1300px limit."
+    }
+  };
+  var WARN_RATIO=0.9;   /* amber from 90% of the limit */
+  var ELLIPSIS=" ...";
+
+  var device="desktop";
+
+  /* ---------- elements ---------- */
+  var $=function(id){return document.getElementById(id);};
+  var inTitle=$("in-title"),inDesc=$("in-desc"),inUrl=$("in-url");
+  var els={
+    title:{meter:$("meter-title"),fill:$("meter-title").querySelector(".meter-fill"),cut:$("meter-title").querySelector(".meter-cut"),px:$("title-px"),state:$("title-state"),note:$("title-note"),chars:$("title-chars")},
+    desc:{meter:$("meter-desc"),fill:$("meter-desc").querySelector(".meter-fill"),cut:$("meter-desc").querySelector(".meter-cut"),px:$("desc-px"),state:$("desc-state"),note:$("desc-note"),chars:$("desc-chars")}
+  };
+  var serpCard=$("serp-card"),serpTitle=$("serp-title"),serpSnippet=$("serp-snippet"),
+      serpSite=$("serp-site"),serpUrl=$("serp-url"),serpFavicon=$("serp-favicon"),
+      caption=$("preview-caption");
+
+  /* ---------- truncation: longest prefix + " ..." that fits, cut at word boundary ---------- */
+  function truncateAt(text,font,limit){
+    if(widthOf(text,font)<=limit)return{text:text,cut:-1};
+    var lo=0,hi=text.length;
+    while(lo<hi){ /* binary search max prefix that fits with ellipsis */
+      var mid=Math.ceil((lo+hi)/2);
+      if(widthOf(text.slice(0,mid)+ELLIPSIS,font)<=limit)lo=mid;else hi=mid-1;
+    }
+    var cut=lo;
+    var space=text.lastIndexOf(" ",cut); /* prefer word boundary like Google */
+    if(space>cut*0.6)cut=space;
+    return{text:text.slice(0,cut).replace(/[\s,;:.-]+$/,"")+ELLIPSIS,cut:cut};
+  }
+
+  /* ---------- meter update ---------- */
+  function updateMeter(key,value,metric){
+    var el=els[key];
+    var w=widthOf(value,metric.font);
+    var pct=metric.limit?(w/metric.limit):0;
+
+    el.fill.style.width=Math.min(pct,1)*100+"%";
+    el.px.textContent=Math.round(w)+"px / "+metric.limit+"px";
+    el.chars.textContent=value.length+" chars";
+
+    el.meter.classList.toggle("is-warn",pct>=WARN_RATIO&&pct<=1);
+    el.meter.classList.toggle("is-over",pct>1);
+
+    if(pct>1){
+      var t=truncateAt(value,metric.font,metric.limit);
+      el.cut.style.left=(metric.limit/w)*100+"%"; /* truncation point marked on the bar */
+      el.state.textContent="truncated";
+      el.note.textContent="Google cuts this at character "+t.cut+" - "+Math.round(w-metric.limit)+"px over.";
+      return t;
+    }
+    el.state.textContent=pct>=WARN_RATIO?"near limit":(value?"within range":"empty");
+    el.note.textContent="";
+    return{text:value,cut:-1};
+  }
+
+  /* ---------- URL -> breadcrumb ---------- */
+  function parseUrl(raw){
+    var fallback={site:"example.com",crumb:"https://example.com",initial:"E"};
+    if(!raw.trim())return fallback;
+    try{
+      var u=new URL(/^https?:\/\//i.test(raw)?raw:"https://"+raw);
+      var host=u.hostname.replace(/^www\./,"");
+      var segs=u.pathname.split("/").filter(Boolean);
+      var crumb=u.protocol+"//"+u.hostname+(segs.length?" › "+segs.join(" › "):"");
+      var name=host.split(".")[0];
+      return{site:host,crumb:crumb,initial:(name[0]||"e").toUpperCase()};
+    }catch(e){return fallback;}
+  }
+
+  /* ---------- master render (every keystroke) ---------- */
+  function render(){
+    var m=METRICS[device];
+    var title=inTitle.value.trim();
+    var desc=inDesc.value.trim();
+
+    var tRes=updateMeter("title",title,m.title);
+    var dRes=updateMeter("desc",desc,m.desc);
+
+    if(title){serpTitle.textContent=tRes.text;serpTitle.classList.remove("serp-empty");}
+    else{serpTitle.textContent="Your meta title appears here";serpTitle.classList.add("serp-empty");}
+
+    serpSnippet.innerHTML="";
+    if(desc){
+      serpSnippet.appendChild(document.createTextNode(dRes.text));
+    }else{
+      var em=document.createElement("span");
+      em.className="serp-empty";
+      em.textContent="Your meta description appears here - Google shows roughly two lines of it.";
+      serpSnippet.appendChild(em);
+    }
+
+    var u=parseUrl(inUrl.value);
+    serpSite.textContent=u.site;
+    serpUrl.textContent=u.crumb;
+    serpFavicon.textContent=u.initial;
+
+    caption.textContent=m.caption;
+  }
+
+  inTitle.addEventListener("input",render);
+  inDesc.addEventListener("input",render);
+  inUrl.addEventListener("input",render);
+
+  /* ---------- device toggle ---------- */
+  var tgD=$("tg-desktop"),tgM=$("tg-mobile");
+  function setDevice(d){
+    device=d;
+    tgD.setAttribute("aria-pressed",d==="desktop");
+    tgM.setAttribute("aria-pressed",d==="mobile");
+    serpCard.classList.toggle("is-mobile",d==="mobile");
+    render();
+  }
+  tgD.addEventListener("click",function(){setDevice("desktop");});
+  tgM.addEventListener("click",function(){setDevice("mobile");});
+
+  /* ---------- entry reveals ---------- */
+  var reveals=document.querySelectorAll(".reveal");
+  if("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion:reduce)").matches){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){e.target.classList.add("is-in");io.unobserve(e.target);}
+      });
+    },{threshold:0.12});
+    reveals.forEach(function(el){io.observe(el);});
+  }else{
+    reveals.forEach(function(el){el.classList.add("is-in");});
+  }
+
+  /* first paint - wait for Arial-adjacent metrics to settle, then render */
+  render();
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(render);
+})();
+</script>
+<script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Meta Title & Description Length Checker",
+    "url": "https://mayantha.ae/meta-length-checker",
+    "description": "Free meta title and description length checker with a pixel-accurate Google SERP preview. Test desktop and mobile truncation limits before you publish.",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": 0,
+      "priceCurrency": "USD"
+    },
+    "provider": {
+      "@type": "Person",
+      "name": "Mayantha Jayasinghe",
+      "url": "https://mayantha.ae"
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How long should a meta title be?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Keep the title under roughly 580 pixels on desktop - usually 50 to 60 characters. Wider than that and Google cuts it mid-thought with an ellipsis, which costs clicks. Pixel width is what matters: wide letters like W and M use up the budget faster than narrow ones."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How long should a meta description be?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Aim for about 920 pixels on desktop - typically 150 to 160 characters. Mobile allows a little more. Google rewrites descriptions it doesn’t like, but a tight, relevant description within the limit is far more likely to be shown as written."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why measure pixels instead of counting characters?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Google truncates snippets at a fixed pixel width, not a character count. “Illinois” and “WWDC 2026” are both 8-9 characters but render at very different widths. Character counters are a rough proxy; this tool measures the actual rendered width using Google’s SERP font metrics."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do desktop and mobile have different limits?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Desktop titles render at Arial 20px with roughly a 580px limit; mobile titles are smaller but wrap across a wider block, so about 920px fits. Descriptions get around 920px on desktop and 1300px on mobile. The device toggle applies the right metrics for each."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Will Google always show my meta description?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Not always - Google generates its own snippet for around a third of results when it thinks page content answers the query better. You still control the default, and a well-written description within the pixel limit is used most of the time."
+        }
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://mayantha.ae"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Tools",
+        "item": "https://mayantha.ae/tools"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Meta Title & Description Length Checker",
+        "item": "https://mayantha.ae/meta-length-checker"
+      }
+    ]
+  }
+]
+</script>
+</body>
+</html>
